@@ -2,16 +2,17 @@
 
 namespace Obs;
 
+use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Obs\Log\ObsLog;
+use RuntimeException;
 
-class ObsException extends \RuntimeException
+class ObsException extends RuntimeException
 {
-	const CLIENT = 'client';
-	
-	const SERVER = 'server';
-	
+    const CLIENT = 'client';
+
+    const SERVER = 'server';
+
     /**
      * @var Response
      */
@@ -31,27 +32,27 @@ class ObsException extends \RuntimeException
      * @var string Exception type (client / server)
      */
     protected $exceptionType;
-        
+
     /**
      * @var string Exception code
      */
     protected $exceptionCode;
-    
+
     /**
      * @var string Exception message
      */
     protected $exceptionMessage;
-    
+
     /**
      * @var string Host ID
      */
     protected $hostId;
-	
-    public function __construct ($message = null, $code = null, $previous = null) 
+
+    public function __construct($message = null, $code = null, $previous = null)
     {
-    	parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
-    
+
     /**
      * Set the exception code
      *
@@ -61,6 +62,7 @@ class ObsException extends \RuntimeException
     {
         $this->exceptionCode = $code;
     }
+
     /**
      * Get the exception code
      *
@@ -70,15 +72,15 @@ class ObsException extends \RuntimeException
     {
         return $this->exceptionCode;
     }
-    
+
     public function setExceptionMessage($message)
     {
-    	$this->exceptionMessage = $message;
+        $this->exceptionMessage = $message;
     }
-    
+
     public function getExceptionMessage()
     {
-    	return $this->exceptionMessage ? $this->exceptionMessage : $this->message;
+        return $this->exceptionMessage ? $this->exceptionMessage : $this->message;
     }
 
     /**
@@ -170,13 +172,15 @@ class ObsException extends \RuntimeException
     {
         return $this->response ? $this->response->getStatusCode() : -1;
     }
-    
-    public function setHostId($hostId){
-    	$this->hostId = $hostId;
+
+    public function setHostId($hostId)
+    {
+        $this->hostId = $hostId;
     }
-    
-    public function getHostId(){
-    	return $this->hostId;
+
+    public function getHostId()
+    {
+        return $this->hostId;
     }
 
     /**
@@ -190,16 +194,17 @@ class ObsException extends \RuntimeException
             . 'OBS Error Code: ' . $this->getExceptionCode() . ', '
             . 'Status Code: ' . $this->getStatusCode() . ', '
             . 'OBS Error Type: ' . $this->getExceptionType() . ', '
-            . 'OBS Error Message: ' . ($this->getExceptionMessage() ? $this->getExceptionMessage():$this->getMessage());
+            . 'OBS Error Message: ' . ($this->getExceptionMessage() ? $this->getExceptionMessage() : $this->getMessage());
 
         // Add the User-Agent if available
         if ($this->request) {
             $message .= ', ' . 'User-Agent: ' . $this->request->getHeaderLine('User-Agent');
         }
         $message .= "\n";
-        
-        ObsLog::commonLog(INFO, "http request:status:%d, %s",$this->getStatusCode(),"code:".$this->getExceptionCode().", message:".$this->getMessage());
+
+        Log::info(printf("http request:status:%d, %s", $this->getStatusCode(), "code:" . $this->getExceptionCode() . ", message:" . $this->getMessage()));
+
         return $message;
     }
-    
+
 }
