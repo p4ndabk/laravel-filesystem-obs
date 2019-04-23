@@ -17,11 +17,22 @@
             "Obs\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Obs\\Test\\": "tests/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
                 "Obs\\ObsServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    },
+    "config": {
+        "sort-packages": true
     }
 }
