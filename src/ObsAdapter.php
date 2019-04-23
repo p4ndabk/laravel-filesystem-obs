@@ -5,6 +5,7 @@ namespace Obs;
 use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\Adapter\Polyfill\NotSupportingVisibilityTrait;
 use League\Flysystem\Config;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 
 /**
  * Class ObsAdapter
@@ -25,16 +26,33 @@ class ObsAdapter extends AbstractAdapter
     protected $bucket;
 
     /**
+     * @var
+     */
+    protected $endpoint;
+
+    /**
+     * @var
+     */
+    protected $cdnDomain;
+
+    /**
+     * @var
+     */
+    protected $ssl;
+
+    /**
      * ObsAdapter constructor.
      * @param ObsClient $client
      * @param string $bucket
      * @param string $prefix
      */
-    public function __construct(ObsClient $client, string $bucket, string $prefix = '')
+    public function __construct(ObsClient $client, string $bucket, string $endpoint, string $cdnDomain, bool $ssl, string $prefix = '')
     {
         $this->client = $client;
-
         $this->bucket = $bucket;
+        $this->endpoint = $endpoint;
+        $this->cdnDomain = $cdnDomain;
+        $this->ssl = $ssl;
 
         $this->setPathPrefix($prefix);
     }
@@ -351,6 +369,17 @@ class ObsAdapter extends AbstractAdapter
         $object = $this->getMetadata($path);
 
         return $object;
+    }
+
+    /**
+     * @param $path
+     * @return string
+     */
+    public function getUrl($path)
+    {
+        return ($this->ssl ? 'https://' : 'http://')
+            . ($this->cdnDomain == '' ? $this->getBucket() . '.' . $this->endpoint : $this->cdnDomain)
+            . '/' . ltrim($path, '/');
     }
 
     /**
