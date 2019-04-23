@@ -1,12 +1,7 @@
 <?php
 
-
 namespace Obs;
 
-use Obs\Log\ObsLog;
-use Obs\Internal\Common\SdkCurlFactory;
-use Obs\Internal\Common\SdkStreamHandler;
-use Obs\Internal\Common\Model;
 use Monolog\Logger;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -14,8 +9,11 @@ use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\Handler\Proxy;
 use GuzzleHttp\Promise\Promise;
+use Illuminate\Support\Facades\Log;
 use Obs\Internal\Resource\Constants;
-
+use Obs\Internal\Common\SdkCurlFactory;
+use Obs\Internal\Common\SdkStreamHandler;
+use Obs\Internal\Common\Model;
 
 define('DEBUG', Logger::DEBUG);
 define('INFO', Logger::INFO);
@@ -348,14 +346,14 @@ class ObsClient
 
     public function initLog(array $logConfig = [])
     {
-        ObsLog::initLog($logConfig);
+        Log::info($logConfig);
 
         $msg = [];
         $msg[] = '[OBS SDK Version=' . self::SDK_VERSION;
         $msg[] = 'Endpoint=' . $this->endpoint;
         $msg[] = 'Access Mode=' . ($this->pathStyle ? 'Path' : 'Virtual Hosting') . ']';
 
-        ObsLog::commonLog(WARNING, implode("];[", $msg));
+        Log::warning(implode("];[", $msg));
     }
 
     private static function choose_handler($obsclient)

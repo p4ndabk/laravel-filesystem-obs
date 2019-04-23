@@ -31,6 +31,8 @@ class ObsServiceProvider extends ServiceProvider
     public function boot()
     {
         Storage::extend('obs', function ($app, $config) {
+            $debug = $config['debug'] ?? false;
+
             if ($debug) {
                 Log::debug('OBS config:', $config);
             }
